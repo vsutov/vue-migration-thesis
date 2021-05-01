@@ -5,9 +5,7 @@
     >
       List of chores
     </router-link>
-    <p>
-      <portal-target name="count-destination" />
-    </p>
+    <div id="count-destination" />
     <router-link
       :to="{ name: 'recycle-bin' }"
     >
@@ -38,7 +36,7 @@ export default {
       color: $primary;
     }
   }
-  p {
+  #count-destination {
     font-weight: bold;
     font-size: 1.5rem;
   }

@@ -1,10 +1,8 @@
 <template>
-  <div id="app">
-    <div class="container">
-      <div class="app-content">
-        <navigation-bar class="has-text-centered" />
-        <router-view />
-      </div>
+  <div class="container">
+    <div class="app-content">
+      <navigation-bar class="has-text-centered" />
+      <router-view />
     </div>
   </div>
 </template>

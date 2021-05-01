@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import { ref, computed, nextTick } from 'vue'
 import Chore from '@/components/Chore'
 
 export default {
@@ -52,54 +53,62 @@ export default {
       required: true
     }
   },
-  data () {
-    return {
-      isEditing: false,
-      contentLocal: ''
-    }
-  },
-  computed: {
-    completedLocal: {
-      get () {
-        return !!this.item.completedAt
-      },
+  emits: ['change'],
+  setup(props, { emit }){
+    const isEditing = ref(false)
+    const contentLocal = ref('')
+    const editInput = ref(null)
 
-      set (value) {
-        this.emitChange({
-          completedAt: value ? Date.now() : null
+    const completedLocal = computed({
+      get: () => !!props.item.completedAt,
+      set: val => {
+        emitChange({
+          completedAt: val ? Date.now() : null
         })
       }
+    })
+
+    const deleteItem = () => emitChange({
+      deletedAt: Date.now()
+    })
+
+    const enableEdit = async () => {
+      contentLocal.value = props.item.content
+      isEditing.value = true
+      await nextTick()
+      editInput.value.focus()
     }
-  },
-  methods: {
-    deleteItem () {
-      this.emitChange({
-        deletedAt: Date.now()
-      })
-    },
-    emitChange (updatedItem) {
-      this.$emit('change', {
-        ...this.item,
+
+    const saveEdit = () => {
+      if(contentLocal.value){
+        emitChange({
+          content: contentLocal.value
+        })
+      }
+      stopEdit()
+    }
+
+    const stopEdit = () => {
+      isEditing.value = false
+      contentLocal.value = ''
+    }
+
+    const emitChange = (updatedItem) => {
+      emit('change', {
+        ...props.item,
         ...updatedItem
       })
-    },
-    async enableEdit () {
-      this.contentLocal = this.item.content
-      this.isEditing = true
-      await this.$nextTick()
-      this.$refs.editInput.focus()
-    },
-    saveEdit () {
-      if (this.contentLocal) {
-        this.emitChange({
-          content: this.contentLocal
-        })
-      }
-      this.stopEdit()
-    },
-    stopEdit () {
-      this.isEditing = false
-      this.contentLocal = ''
+    }
+
+    return { 
+      completedLocal,
+      enableEdit,
+      isEditing,
+      contentLocal, 
+      editInput,
+      saveEdit,
+      stopEdit,
+      deleteItem
     }
   }
 }
